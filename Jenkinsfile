@@ -31,8 +31,6 @@ pipeline {
             }
         }
 
-    }
-
         stage('Deploy to Tomcat') {
             steps {
                 sh '''
@@ -43,6 +41,7 @@ pipeline {
             }
         } 
     }
+
     post {
         success {
             echo 'Deployment successfully!'
@@ -52,4 +51,3 @@ pipeline {
             echo 'Deployment failed!'
         }
     }
-
