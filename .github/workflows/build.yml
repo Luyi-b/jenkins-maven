@@ -29,6 +29,26 @@ jobs:
       - name: Package Application
         run: mvn package
 
+      - name: Copy WAR to EC2
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          source: "target/emraay-bank-app.war"
+          target: "/tmp"
+
+      - name: Deploy to Tomcat
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            sudo cp /tmp/target/emraay-bank-app.war /opt/tomcat/webapps/
+            sudo chown tomcat:tomcat /opt/tomcat/webapps/emraay-bank-app.war
+            sudo systemctl restart tomcat
+
       - name: Deployment Successful
         if: success()
         run: echo "Deployment successfully!"
